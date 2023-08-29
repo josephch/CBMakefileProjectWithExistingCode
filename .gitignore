@@ -1,0 +1,9 @@
+.cache/
+.objs/
+MakefileProjectWithExistingCode.cbplugin
+MakefileProjectWithExistingCode.depend
+MakefileProjectWithExistingCode.layout
+MakefileProjectWithExistingCode.so
+MakefileProjectWithExistingCode.zip
+compile_commands.json
+libMakefileProjectWithExistingCode.so

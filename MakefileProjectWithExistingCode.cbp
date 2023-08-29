@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="MakefileProjectWithExistingCode" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="default">
+				<Option output="MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option object_output=".objs/default" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="`pkg-config --cflags codeblocks`" />
+					<Add option="`wx-config --cflags  --version=3.0`" />
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="`pkg-config --libs codeblocks`" />
+					<Add option="`wx-config --libs  --version=3.0`" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Add after="cp -f libMakefileProjectWithExistingCode.so MakefileProjectWithExistingCode.so" />
+					<Add after="zip -j9 MakefileProjectWithExistingCode.cbplugin MakefileProjectWithExistingCode.so MakefileProjectWithExistingCode.zip" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="to_codeblocks_wx28">
+				<Option output="$(#cb)/devel/share/codeblocks/plugins/MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="$(#cb)/devel" />
+				<Option object_output=".objs/to_codeblocks_wx28" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--debug-log --multiple-instance --no-splash-screen --verbose -p debug --no-ipc " />
+				<Option host_application="$(#cb)/devel/codeblocks" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="`wx-config --cflags  --version=2.8`" />
+					<Add option="-g" />
+					<Add directory="$(#cb)/include" />
+					<Add directory="$(#cb)/sdk/wxscintilla/include" />
+					<Add directory="$(#cb)/include/tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs  --version=2.8`" />
+					<Add library="codeblocks" />
+					<Add directory="$(#cb)/devel" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 $(#cb)/devel/share/codeblocks/MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="to_codeblocks_wx30">
+				<Option output="$(#cb)/devel30/share/codeblocks/plugins/MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="$(#cb)/devel30" />
+				<Option object_output=".objs/to_codeblocks_wx30" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--debug-log --multiple-instance --no-splash-screen --verbose -p debug --no-ipc " />
+				<Option host_application="$(#cb)/devel30/codeblocks" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="`wx-config --cflags  --version=3.0`" />
+					<Add option="-g" />
+					<Add directory="$(#cb)/include" />
+					<Add directory="$(#cb)/sdk/wxscintilla/include" />
+					<Add directory="$(#cb)/include/tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs  --version=3.0`" />
+					<Add library="codeblocks" />
+					<Add directory="$(#cb)/devel30" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 $(#cb)/devel30/share/codeblocks/MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="to_codeblocks_wx31">
+				<Option output="$(#cb)/devel31/share/codeblocks/plugins/MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="$(#cb)/devel31" />
+				<Option object_output=".objs/to_codeblocks_wx31" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--debug-log --multiple-instance --no-splash-screen --verbose -p debug --no-ipc " />
+				<Option host_application="$(#cb)/devel31/codeblocks" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="`wx-config --cflags  --version=3.1`" />
+					<Add option="-g" />
+					<Add directory="$(#cb)/include" />
+					<Add directory="$(#cb)/sdk/wxscintilla/include" />
+					<Add directory="$(#cb)/include/tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs  --version=3.1`" />
+					<Add library="codeblocks" />
+					<Add directory="$(#cb)/devel31" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 $(#cb)/devel31/share/codeblocks/MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="to_codeblocks_wx32">
+				<Option output="$(#cb)/devel32/share/codeblocks/plugins/MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="$(#cb)/devel32" />
+				<Option object_output=".objs/to_codeblocks_wx32" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--debug-log --multiple-instance --no-splash-screen --verbose -p debug --no-ipc " />
+				<Option host_application="$(#cb)/devel32/codeblocks" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="`wx-config --cflags  --version=3.2`" />
+					<Add option="-g" />
+					<Add directory="$(#cb)/include" />
+					<Add directory="$(#cb)/sdk/wxscintilla/include" />
+					<Add directory="$(#cb)/include/tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs  --version=3.2`" />
+					<Add library="codeblocks" />
+					<Add directory="$(#cb)/devel32" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 $(#cb)/devel32/share/codeblocks/MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+			<Target title="to_codeblocks_wx33">
+				<Option output="$(#cb)/devel33/share/codeblocks/plugins/MakefileProjectWithExistingCode" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="$(#cb)/devel33" />
+				<Option object_output=".objs/to_codeblocks_wx33" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option parameters="--debug-log --multiple-instance --no-splash-screen --verbose -p debug --no-ipc " />
+				<Option host_application="$(#cb)/devel33/codeblocks" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="`wx-config --cflags  --version=3.3`" />
+					<Add option="-g" />
+					<Add directory="$(#cb)/include" />
+					<Add directory="$(#cb)/sdk/wxscintilla/include" />
+					<Add directory="$(#cb)/include/tinyxml" />
+				</Compiler>
+				<Linker>
+					<Add option="`wx-config --libs  --version=3.3`" />
+					<Add library="codeblocks" />
+					<Add directory="$(#cb)/devel33" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="zip -j9 $(#cb)/devel33/share/codeblocks/MakefileProjectWithExistingCode.zip manifest.xml" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="default;to_codeblocks_wx28;to_codeblocks_wx30;to_codeblocks_wx31;to_codeblocks_wx32;to_codeblocks_wx33;" />
+		</VirtualTargets>
+		<Compiler>
+			<Add option="-std=c++11" />
+			<Add option="-fPIC" />
+		</Compiler>
+		<Linker>
+			<Add option="-Wl,--no-undefined" />
+		</Linker>
+		<Unit filename="MakefileProjectWithExistingCode.cpp" />
+		<Unit filename="MakefileProjectWithExistingCode.h" />
+		<Unit filename="manifest.xml" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
