@@ -4,9 +4,11 @@ Create new C::B project from make file project with existing code.
 
 ## Usage
 Build using C::B
-Install via Plugins-> Manage Plugins -> Install New
-On successful installation, File menu will have following item
-Makefile Project With Existing Code
+
+Install via Plugins-> Manage Plugins -> Install New  
+On successful installation, File menu will have following item  
+> Makefile Project With Existing Code
+ 
 Select, browse to the directory to be added and select.
 
 ## Known issues
