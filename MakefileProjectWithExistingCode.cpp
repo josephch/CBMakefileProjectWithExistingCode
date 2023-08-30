@@ -1,5 +1,9 @@
-#include <sdk.h> // Code::Blocks SDK
+/*
+ * This file uses parts of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
+#include <sdk.h> // Code::Blocks SDK
 
 #include <wx/filename.h>
 #include <wx/intl.h>
@@ -48,24 +52,25 @@ MakefileProjectWithExistingCode::MakefileProjectWithExistingCode()
 
 void MakefileProjectWithExistingCode::BuildMenu(wxMenuBar* menuBar)
 {
+    LogManager* logManager = Manager::Get()->GetLogManager();
 
     if (!IsAttached() || !menuBar)
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Preconditions not met!"), pluginName));
+        logManager->LogError(wxString::Format(_("%s Preconditions not met!"), pluginName));
         return;
     }
 
     const int fileMenuIndex = menuBar->FindMenu( _("&File") );
     if ( fileMenuIndex == wxNOT_FOUND )
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Could not get File menu Idx!"), pluginName));
+        logManager->LogError(wxString::Format(_("%s Could not get File menu Idx!"), pluginName));
         return;
     }
 
     wxMenu* fileMenu = menuBar->GetMenu(fileMenuIndex);
     if (!fileMenu)
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Could not get File menu!"), pluginName));
+        logManager->LogError(wxString::Format(_("%s Could not get File menu!"), pluginName));
         return;
     }
 
@@ -85,22 +90,36 @@ void MakefileProjectWithExistingCode::BuildMenu(wxMenuBar* menuBar)
             ++id;
         }
         // The position is hard-coded to "Recent Files" menu. Please adjust it if necessary
-        fileMenu->Insert(++id, idMakefileProjectWithExistingCode, _("&Project from Directory"), _("&Project from Directory"));
+        fileMenu->Insert(++id, idMakefileProjectWithExistingCode, _("&Makefile Project With Existing Code"), _("&Makefile Project With Existing Code"));
         fileMenu->InsertSeparator(++id);
     }
     else
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Menu already present!"), pluginName));
+        logManager->LogError(wxString::Format(_("%s Menu already present!"), pluginName));
     }
 
 }
 
 void MakefileProjectWithExistingCode::OnMakefileProjectWithExistingCode( wxCommandEvent& event )
 {
-    Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s Yay!"), pluginName));
-    ProjectManager* pm = Manager::Get()->GetProjectManager();
-    wxString basePath;
+    wxString errorString;
+    if (!CreateMakefileProjectWithExistingCode(errorString))
+    {
+        if (!errorString.IsEmpty())
+        {
+            Manager::Get()->GetLogManager()->LogError(errorString);
+            cbMessageBox(_(errorString), _("Error"), wxICON_ERROR);
+        }
+    }
+}
 
+bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxString &errorString)
+{
+    LogManager* logManager = Manager::Get()->GetLogManager();
+
+    logManager->Log(wxString::Format(_("%s Yay!"), pluginName));
+    ProjectManager* projectManager = Manager::Get()->GetProjectManager();
+    wxString basePath;
 
     wxString dir = ChooseDirectory(nullptr,
                                    _("Open directory..."),
@@ -110,87 +129,112 @@ void MakefileProjectWithExistingCode::OnMakefileProjectWithExistingCode( wxComma
                                    false);
     if (dir.IsEmpty())
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Empty directory!"), pluginName));
-        return;
+        errorString = wxString::Format(_("%s: Empty directory!"), pluginName);
+        return false;
     }
-
 
     wxString fileName = dir.AfterLast(wxFileName::GetPathSeparator());
 
-    wxFileName the_file(dir + wxFileName::GetPathSeparator() + fileName);
-    the_file.SetExt(FileFilters::CODEBLOCKS_EXT);
-    Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s dir %s fileName %s!"), pluginName, dir, the_file.GetFullPath()));
+    wxFileName fileNameFull(dir + wxFileName::GetPathSeparator() + fileName);
+    fileNameFull.SetExt(FileFilters::CODEBLOCKS_EXT);
+    logManager->Log(wxString::Format(_("%s dir %s fileNameFull %s!"), pluginName, dir, fileNameFull.GetFullPath()));
 
-    cbProject* prj = pm->NewProject(the_file.GetFullPath());
+    cbProject* prj = projectManager->NewProject(fileNameFull.GetFullPath());
     if (!prj)
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Could not create project!"), pluginName));
-        return;
+        errorString = wxString::Format(_("%s : Could not create project!"), pluginName);
+        return false;
     }
 
+    bool projectSetupCompleted = false;
     // generate list of files to add
     wxArrayString array;
     wxDir::GetAllFiles(dir, &array, wxEmptyString, wxDIR_FILES | wxDIR_DIRS);
     if (array.GetCount() == 0)
-        return;
-
-    // for usability reasons, remove any directory entries from the list...
-    unsigned int i = 0;
-    while (i < array.GetCount())
     {
-        // discard directories, as well as some well known SCMs control folders ;)
-        // also discard C::B project files
-        if (wxDirExists(array[i]) ||
-                array[i].Contains(_T("/.git/")) ||
-                array[i].Contains(_T("\\.git\\")) ||
-                array[i].Contains(_T("\\.hg\\")) ||
-                array[i].Contains(_T("/.hg/")) ||
-                array[i].Contains(_T("\\.svn\\")) ||
-                array[i].Contains(_T("/.svn/")) ||
-                array[i].Contains(_T("\\CVS\\")) ||
-                array[i].Contains(_T("/CVS/")) ||
-                array[i].Lower().Matches(_T("*.cbp")))
+        errorString = wxString::Format(_("%s : Could not find any files!"), pluginName);
+    }
+    else
+    {
+        // remove any directory entries, some well known SCMs control folders and  C::B project files from the list...
+        const size_t endIdx = array.GetCount() - 1;
+        for (int i  = endIdx; i >= 0; i--)
         {
-            array.RemoveAt(i);
+            if (wxDirExists(array[i]) ||
+                    (wxString::npos != array[i].find(_T("/.git/"))) ||
+                    (wxString::npos != array[i].find(_T("\\.git\\"))) ||
+                    (wxString::npos != array[i].find(_T("\\.hg\\"))) ||
+                    (wxString::npos != array[i].find(_T("/.hg/"))) ||
+                    (wxString::npos != array[i].find(_T("\\.svn\\"))) ||
+                    (wxString::npos != array[i].find(_T("/.svn/"))) ||
+                    (wxString::npos != array[i].find(_T("\\CVS\\"))) ||
+                    (wxString::npos != array[i].find(_T("/CVS/"))) ||
+                    (wxString::npos != array[i].find(_T("\\CMakeFiles\\"))) ||
+                    (wxString::npos != array[i].find(_T("/CMakeFiles/"))) ||
+                    array[i].Lower().Matches(_T("*.cbp")))
+            {
+                array.RemoveAt(i);
+            }
+        }
+
+        if (array.GetCount() == 0)
+        {
+            errorString = wxString::Format(_("%s : Could not find any valid files!"), pluginName);
         }
         else
-            ++i;
+        {
+            logManager->Log(wxString::Format(_("%s : Before filter %d files present!"), pluginName, (int)array.GetCount()));
+
+            wxString wild;
+            const FilesGroupsAndMasks* fgam = projectManager->GetFilesGroupsAndMasks();
+            for (unsigned fm_idx = 0; fm_idx < fgam->GetGroupsCount(); fm_idx++)
+                wild += fgam->GetFileMasks(fm_idx);
+
+            MultiSelectDlg dlg(nullptr, array, wild, _("Select the files to add to the project:"));
+            PlaceWindow(&dlg);
+            if (dlg.ShowModal() != wxID_OK)
+            {
+                logManager->Log(wxString::Format(_("%s : Dialog ShowModal canceled!"), pluginName));
+            }
+            else
+            {
+                array = dlg.GetSelectedStrings();
+
+                if (array.GetCount() == 0)
+                {
+                    errorString = wxString::Format(_("%s : No files selected!"), pluginName);
+                }
+                else
+                {
+                    prj->SetMakefileCustom(true);
+                    prj->AddBuildTarget("all");
+
+                    wxArrayInt targets;
+                    targets.Add(0);
+
+                    projectManager->AddMultipleFilesToProject(array, prj, targets);
+                    logManager->Log(wxString::Format(_("%s Added %d files!"), pluginName, (int)array.GetCount()));
+                    prj->SetModified(true);
+                    prj->CalculateCommonTopLevelPath();
+                    prj->Save();
+
+                    if (!projectManager->IsLoadingWorkspace())
+                    {
+                        projectManager->SetProject(prj);
+                    }
+                    projectManager->GetUI().RebuildTree();
+                    projectSetupCompleted = true;
+                }
+            }
+        }
+
     }
-    Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s Array before dialog %d files!"), pluginName, (int)array.GetCount()));
-
-    wxString wild;
-    const FilesGroupsAndMasks* fgam = pm->GetFilesGroupsAndMasks();
-    for (unsigned fm_idx = 0; fm_idx < fgam->GetGroupsCount(); fm_idx++)
-        wild += fgam->GetFileMasks(fm_idx);
-
-    MultiSelectDlg dlg(nullptr, array, wild, _("Select the files to add to the project:"));
-    PlaceWindow(&dlg);
-    if (dlg.ShowModal() != wxID_OK)
+    if (!projectSetupCompleted)
     {
-        Manager::Get()->GetLogManager()->LogError(wxString::Format(_("%s Dialog ShowModal failed!"), pluginName));
-        return;
+        projectManager->CloseProject(prj, true, false);
+        projectManager->GetUI().RebuildTree();
     }
-    array = dlg.GetSelectedStrings();
-
-    prj->SetMakefileCustom(true);
-    prj->AddBuildTarget("all");
-
-    wxArrayInt targets;
-    // ask for target only if more than one
-    if (prj->GetBuildTargetsCount() >= 1)
-        targets.Add(0);
-
-    // finally add the files
-    pm->AddMultipleFilesToProject(array, prj, targets);
-    Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s Added %d files!"), pluginName, (int)array.GetCount()));
-    prj->SetModified(true);
-    prj->CalculateCommonTopLevelPath();
-    prj->Save();
-
-    if (!Manager::Get()->GetProjectManager()->IsLoadingWorkspace())
-        Manager::Get()->GetProjectManager()->SetProject(prj);
-    //Manager::Get()->GetProjectManager()->CloseProject(prj, true, false);
-    Manager::Get()->GetProjectManager()->GetUI().RebuildTree();
+    return projectSetupCompleted;
 }
 
 void MakefileProjectWithExistingCode::OnAttach()

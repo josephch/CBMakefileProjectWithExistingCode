@@ -1,11 +1,7 @@
-/***************************************************************
- * Name:      MakefileProjectWithExistingCode
- * Purpose:   Code::Blocks plugin
- * Author:    Christo Joseph (christo.j@gmail.com)
- * Created:   2023-08-20
- * Copyright: Christo Joseph
- * License:   GPL
- **************************************************************/
+/*
+ * This file uses parts of the Code::Blocks IDE and licensed under the GNU General Public License, version 3
+ * http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 #ifndef MakefileProjectWithExistingCode_H_INCLUDED
 #define MakefileProjectWithExistingCode_H_INCLUDED
@@ -29,14 +25,15 @@ public:
 
     void BuildMenu(wxMenuBar* menuBar) override;
 
-
 protected:
     void OnAttach() override;
 
     void OnRelease(bool appShutDown) override;
-
-    void OnMakefileProjectWithExistingCode( wxCommandEvent& event );
     DECLARE_EVENT_TABLE()
+
+private:
+    void OnMakefileProjectWithExistingCode( wxCommandEvent& event );
+    bool CreateMakefileProjectWithExistingCode(wxString &error);
 };
 
 #endif // MakefileProjectWithExistingCode_H_INCLUDED
