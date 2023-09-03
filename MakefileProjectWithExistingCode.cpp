@@ -113,12 +113,47 @@ void MakefileProjectWithExistingCode::OnMakefileProjectWithExistingCode( wxComma
     }
 }
 
+bool MakefileProjectWithExistingCode::CreateProjectInternal(const wxString& fileName, const wxArrayString& filelist, wxString &errorString)
+{
+    bool ret;
+    ProjectManager* projectManager = Manager::Get()->GetProjectManager();
+    cbProject* prj = projectManager->NewProject(fileName);
+    if (!prj)
+    {
+        errorString = wxString::Format(_("%s : Could not create project!"), pluginName);
+        ret = false;
+    }
+    else
+    {
+        projectManager->BeginLoadingProject();
+        prj->SetMakefileCustom(true);
+        prj->AddBuildTarget("all");
+
+        wxArrayInt targets;
+        targets.Add(0);
+
+        projectManager->AddMultipleFilesToProject(filelist, prj, targets);
+        Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s Added %d files!"), pluginName, (int)filelist.GetCount()));
+        prj->SetModified(true);
+        prj->CalculateCommonTopLevelPath();
+        prj->Save();
+
+        if (!projectManager->IsLoadingWorkspace())
+        {
+            projectManager->SetProject(prj);
+        }
+        projectManager->GetUI().RebuildTree();
+        projectManager->EndLoadingProject(prj);
+        ret = true;
+    }
+    return ret;
+}
+
 bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxString &errorString)
 {
     LogManager* logManager = Manager::Get()->GetLogManager();
 
     logManager->Log(wxString::Format(_("%s Yay!"), pluginName));
-    ProjectManager* projectManager = Manager::Get()->GetProjectManager();
     wxString basePath;
 
     wxString dir = ChooseDirectory(nullptr,
@@ -138,13 +173,6 @@ bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxSt
     wxFileName fileNameFull(dir + wxFileName::GetPathSeparator() + fileName);
     fileNameFull.SetExt(FileFilters::CODEBLOCKS_EXT);
     logManager->Log(wxString::Format(_("%s dir %s fileNameFull %s!"), pluginName, dir, fileNameFull.GetFullPath()));
-
-    cbProject* prj = projectManager->NewProject(fileNameFull.GetFullPath());
-    if (!prj)
-    {
-        errorString = wxString::Format(_("%s : Could not create project!"), pluginName);
-        return false;
-    }
 
     bool projectSetupCompleted = false;
     // generate list of files to add
@@ -186,7 +214,7 @@ bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxSt
             logManager->Log(wxString::Format(_("%s : Before filter %d files present!"), pluginName, (int)array.GetCount()));
 
             wxString wild;
-            const FilesGroupsAndMasks* fgam = projectManager->GetFilesGroupsAndMasks();
+            const FilesGroupsAndMasks* fgam = Manager::Get()->GetProjectManager()->GetFilesGroupsAndMasks();
             for (unsigned fm_idx = 0; fm_idx < fgam->GetGroupsCount(); fm_idx++)
                 wild += fgam->GetFileMasks(fm_idx);
 
@@ -206,33 +234,11 @@ bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxSt
                 }
                 else
                 {
-                    prj->SetMakefileCustom(true);
-                    prj->AddBuildTarget("all");
-
-                    wxArrayInt targets;
-                    targets.Add(0);
-
-                    projectManager->AddMultipleFilesToProject(array, prj, targets);
-                    logManager->Log(wxString::Format(_("%s Added %d files!"), pluginName, (int)array.GetCount()));
-                    prj->SetModified(true);
-                    prj->CalculateCommonTopLevelPath();
-                    prj->Save();
-
-                    if (!projectManager->IsLoadingWorkspace())
-                    {
-                        projectManager->SetProject(prj);
-                    }
-                    projectManager->GetUI().RebuildTree();
-                    projectSetupCompleted = true;
+                    projectSetupCompleted = CreateProjectInternal(fileNameFull.GetFullPath(), array, errorString);
                 }
             }
         }
 
-    }
-    if (!projectSetupCompleted)
-    {
-        projectManager->CloseProject(prj, true, false);
-        projectManager->GetUI().RebuildTree();
     }
     return projectSetupCompleted;
 }

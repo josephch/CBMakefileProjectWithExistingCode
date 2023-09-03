@@ -34,6 +34,7 @@ protected:
 private:
     void OnMakefileProjectWithExistingCode( wxCommandEvent& event );
     bool CreateMakefileProjectWithExistingCode(wxString &error);
+    bool CreateProjectInternal(const wxString& fileName, const wxArrayString& filelist, wxString &errorString);
 };
 
 #endif // MakefileProjectWithExistingCode_H_INCLUDED
