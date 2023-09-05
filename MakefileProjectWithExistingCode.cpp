@@ -125,7 +125,6 @@ bool MakefileProjectWithExistingCode::CreateProjectInternal(const wxString& file
     }
     else
     {
-        projectManager->BeginLoadingProject();
         prj->SetMakefileCustom(true);
         prj->AddBuildTarget("all");
 
@@ -141,9 +140,23 @@ bool MakefileProjectWithExistingCode::CreateProjectInternal(const wxString& file
         if (!projectManager->IsLoadingWorkspace())
         {
             projectManager->SetProject(prj);
+            /*Changes from Pecan - instead of PM SetProject, close and open projects
+            https://forums.codeblocks.org/index.php/topic,25509.msg173704.html#msg173704
+            */
+            bool ok = projectManager->CloseProject(prj, true, true);
+            if (!ok)
+            {
+                errorString = wxString::Format(_("%s : Could not close project!"), pluginName);
+                ret = false;
+            }
+            cbProject* prj = projectManager->LoadProject(fileName, true);
+            if (!prj)
+            {
+                errorString = wxString::Format(_("%s : Could not open project!"), pluginName);
+                ret = false;
+            }
         }
         projectManager->GetUI().RebuildTree();
-        projectManager->EndLoadingProject(prj);
         ret = true;
     }
     return ret;
@@ -199,6 +212,8 @@ bool MakefileProjectWithExistingCode::CreateMakefileProjectWithExistingCode(wxSt
                     (wxString::npos != array[i].find(_T("/CVS/"))) ||
                     (wxString::npos != array[i].find(_T("\\CMakeFiles\\"))) ||
                     (wxString::npos != array[i].find(_T("/CMakeFiles/"))) ||
+                    (wxString::npos != array[i].find(_T("/.cache/"))) ||
+                    (wxString::npos != array[i].find(_T("\\.cache\\"))) ||
                     array[i].Lower().Matches(_T("*.cbp")))
             {
                 array.RemoveAt(i);
