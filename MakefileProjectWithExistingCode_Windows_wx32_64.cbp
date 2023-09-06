@@ -41,7 +41,7 @@
 			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="All" targets="default;to_codeblocks_wx28;to_codeblocks_wx30;to_codeblocks_wx31;to_codeblocks_wx32;to_codeblocks_wx33;" />
+			<Add alias="All" targets="to_wn_wx32_64;" />
 		</VirtualTargets>
 		<Compiler>
 			<Add option="-std=c++11" />

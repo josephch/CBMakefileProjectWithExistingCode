@@ -14,4 +14,7 @@ Select, browse to the directory to be added and select.
 ## Test status
 Tested on Ubuntu 16.04 with svn rev 13343 and wx30
 
+Windows build should work with project file
+> MakefileProjectWithExistingCode_Windows_wx32_64.cbp  
+
 ## Known issues
