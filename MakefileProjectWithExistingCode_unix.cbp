@@ -15,6 +15,7 @@
 					<Add option="`pkg-config --cflags codeblocks`" />
 					<Add option="`wx-config --cflags  --version=3.0`" />
 					<Add option="-g" />
+					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
 					<Add option="`pkg-config --libs codeblocks`" />

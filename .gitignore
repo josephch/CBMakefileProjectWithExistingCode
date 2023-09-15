@@ -7,5 +7,6 @@ MakefileProjectWithExistingCode.so
 MakefileProjectWithExistingCode.zip
 compile_commands.json
 libMakefileProjectWithExistingCode.so
-MakefileProjectWithExistingCode_Linux.depend
 MakefileProjectWithExistingCode_Windows_wx32_64.depend
+MakefileProjectWithExistingCode_unix.layout
+MakefileProjectWithExistingCode_unix.depend
