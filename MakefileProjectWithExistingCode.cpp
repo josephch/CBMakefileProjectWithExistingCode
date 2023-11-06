@@ -130,11 +130,16 @@ bool MakefileProjectWithExistingCode::CreateProjectInternal(const wxString& file
 
         wxArrayInt targets;
         targets.Add(0);
+#ifdef DEBUG
+        for (const wxString& file: filelist)
+        {
+            fprintf(stderr, "%s\n", file.ToUTF8().data());
+        }
+#endif // DEBUG
 
         projectManager->AddMultipleFilesToProject(filelist, prj, targets);
         Manager::Get()->GetLogManager()->Log(wxString::Format(_("%s Added %d files!"), pluginName, (int)filelist.GetCount()));
         prj->SetModified(true);
-        prj->CalculateCommonTopLevelPath();
         prj->Save();
 
         if (!projectManager->IsLoadingWorkspace())
