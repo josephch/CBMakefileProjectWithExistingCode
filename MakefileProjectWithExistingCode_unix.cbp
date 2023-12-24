@@ -13,13 +13,13 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="`pkg-config --cflags codeblocks`" />
-					<Add option="`wx-config --cflags  --version=3.0`" />
+					<Add option="`wx-config --cflags`" />
 					<Add option="-g" />
 					<Add option="-Wall" />
 				</Compiler>
 				<Linker>
 					<Add option="`pkg-config --libs codeblocks`" />
-					<Add option="`wx-config --libs  --version=3.0`" />
+					<Add option="`wx-config --libs`" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="zip -j9 MakefileProjectWithExistingCode.zip manifest.xml" />
